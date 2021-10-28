@@ -11,7 +11,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 
 const second = () => {
-    const [lista, setLista] = useState([{}])
+    const [lista, setLista] = useState('')
     const [fields, setFields] = useState({
         campo1: '',
         campo2: '',
@@ -45,7 +45,14 @@ const second = () => {
         if (errores.length > 0) {
             console.log({ errores })
         } else {
-            setLista((prev) => [prev, fields]);
+            setLista([...lista, fields]);
+            setFields({
+                campo1: '',
+                campo2: '',
+                campo3: '',
+                campo4: '',
+                campo5: '',
+            })
             console.log(lista)
         }
     }
@@ -126,10 +133,10 @@ const second = () => {
                 <Typography variant="h4">Proveedores registrados</Typography>
             )}
             <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                {lista.lenght > 1 && lista.map((item, index) => (<>
-                    <ListItem alignItems="flex-start" key={index}>
+                {lista && lista.map((item, index) => (<>
+                    <ListItem alignItems="flex-start" key={`${item.campo1}-${index}`}>
                         <ListItemAvatar>
-                            <Avatar>{item.campo1[0]}</Avatar>
+                            <Avatar>{item.campo1.charAt(0).toUpperCase()}</Avatar>
                         </ListItemAvatar>
                         <ListItemText
                             primary={item.campo1}
