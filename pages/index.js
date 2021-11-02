@@ -7,9 +7,9 @@ export default function Home() {
   return (<>
     <Navbar title={title} />
     <Box style={{ display: "flex", flexFlow: "row wrap", justifyContent: "center", alignItems: "center", margin: "15px" }}>
-      <Button onClick={() => { Router.push("/first") }} color="primary" variant="contained" style={{ margin: "5px" }}>Vista 1</Button>
-      <Button onClick={() => { Router.push("/second") }} color="primary" variant="contained" style={{ margin: "5px" }}>Vista 2</Button>
-      <Button onClick={() => { Router.push("/third") }} color="primary" variant="contained" style={{ margin: "5px" }}>Vista 3</Button>
+      <Button onClick={() => { Router.push("/oportunidades") }} color="primary" variant="contained" style={{ margin: "5px" }}>Oportunidades</Button>
+      <Button onClick={() => { Router.push("/procura") }} color="primary" variant="contained" style={{ margin: "5px" }}>Procura</Button>
+      <Button onClick={() => { Router.push("/cotizaciones") }} color="primary" variant="contained" style={{ margin: "5px" }}>Cotizaciones</Button>
     </Box>
   </>
   );

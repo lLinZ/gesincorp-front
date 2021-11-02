@@ -11,6 +11,7 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
+import PostAddIcon from '@mui/icons-material/PostAdd';
 import { IconButton } from '@mui/material';
 
 import Link from "next/link";
@@ -47,8 +48,33 @@ export default function Sidebar() {
                         <ListItemText primary="Pagina principal" />
                     </ListItem>
                 </Link>
+                <Divider />
+                <Link href="/oportunidades">
+                    <ListItem button >
+                        <ListItemIcon>
+                            <PostAddIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Registro de oportunidades" />
+                    </ListItem>
+                </Link>
+                <Link href="/procura">
+                    <ListItem button >
+                        <ListItemIcon>
+                            <PostAddIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Procura" />
+                    </ListItem>
+                </Link>
+                <Link href="/cotizaciones">
+                    <ListItem button >
+                        <ListItemIcon>
+                            <PostAddIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Cotizaciones" />
+                    </ListItem>
+                </Link>
+                <Divider />
             </List>
-            <Divider />
         </Box>
     );
 
