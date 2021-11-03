@@ -1,11 +1,15 @@
-import { Button, TextField, Grid, MenuItem, Select, InputLabel } from "@mui/material"
+import React, { useState } from "react"
+import { Button, TextField, Grid, MenuItem, Select, InputLabel, Snackbar } from "@mui/material"
 import { makeStyles } from "@mui/styles"
 import { Box } from "@mui/system"
 import { Formik } from "formik"
 import Navbar from "../components/Navbar"
 import Autocomplete from '@mui/material/Autocomplete';
-import { useState } from "react"
+import MuiAlert from '@mui/material/Alert';
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 /* Titulo que tendra la Navbar */
 const title = "Registro de oportunidades";
 
@@ -65,6 +69,20 @@ export const getServerSideProps = async (req, res) => {
 
 /* Functional Component */
 const Oportunidades = ({ clientes, vendedores }) => {
+    const [alert, setAlert] = useState({
+        alert: false,
+        title: '',
+        text: '',
+        type: ''
+    })
+    const handleClose = () => {
+        setAlert({
+            alert: false,
+            title: '',
+            text: '',
+            type: ''
+        })
+    }
     const classes = useStyle();
     return (
         <>
@@ -83,24 +101,52 @@ const Oportunidades = ({ clientes, vendedores }) => {
                                 requerimiento: '',
                                 comentario: '',
                                 idcliente: 0,
+                                idvendedor: 0,
                                 direccionentrega: '',
                                 prioridad_precio: '',
                                 prioridad_plazo: '',
                                 prioridad_marca: '',
                                 prioridad_garantia: '',
-                                fechahora: '',
-                                plazo: '',
-                                status: '',
-                                idvendedor: 0,
                                 montolead: '',
+                                plazo: '',
+                                fechahora: '',
                                 fechaestimadacierre: '',
                             }}
-                            onSubmit={async () => {
-                                console.log('Formulario enviado')
-                                const urlSend = `${window.location.origin}/api/oportunidad/add`
+                            onSubmit={async (datos, { initialValues, resetForm }) => {
+
+                                console.log('Formulario enviado', { datos });
+                                const urlSend = `${window.location.origin}/api/oportunidad/add`;
+                                const raw = JSON.stringify({ datos: datos })
+                                const optionsSend = {
+                                    method: 'POST',
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: raw
+                                }
+                                const respuesta = await fetch(urlSend, optionsSend);
+
+                                if (respuesta.status === 200) {
+                                    const data = await respuesta.json();
+                                    console.log(data);
+                                    resetForm(initialValues);
+                                    setAlert({
+                                        alert: true,
+                                        title: "Yay!",
+                                        text: 'Se ha registrado el usuario exitosamente',
+                                        type: "success"
+                                    })
+                                } else {
+                                    setAlert({
+                                        alert: true,
+                                        title: "Oops...",
+                                        text: 'No se ha logrado registrar el usuario',
+                                        type: "warning"
+                                    })
+                                }
                             }}
                         >
-                            {({ handleChange, handleSubmit, values }) => (
+                            {({ handleChange, handleSubmit, values, resetForm, initialValues }) => (
                                 <form className="formulario" onSubmit={handleSubmit} style={{ display: "flex", flexFlow: "column wrap", padding: "10px" }}>
                                     <Grid container justifyContent="center" alignItems="center" columnSpacing={1}>
 
@@ -146,7 +192,7 @@ const Oportunidades = ({ clientes, vendedores }) => {
                                                 <MenuItem value={0} disabled>
                                                     <em>Seleccionar</em>
                                                 </MenuItem>
-                                                {clientes.map(cl => (<MenuItem value={cl.id}>{`${cl.nombre} ${cl.rif}`}</MenuItem>))}
+                                                {clientes.map(cl => (<MenuItem key={cl.id} value={cl.id}>{`${cl.nombre} ${cl.rif}`}</MenuItem>))}
                                             </Select>
                                         </Grid>
                                         {/* idvendedor */}
@@ -164,7 +210,7 @@ const Oportunidades = ({ clientes, vendedores }) => {
                                                 <MenuItem value={0} disabled>
                                                     <em>Seleccionar</em>
                                                 </MenuItem>
-                                                {vendedores.map(vendedor => (<MenuItem value={vendedor.id}>{`${vendedor.nombre} ${vendedor.cedula}`}</MenuItem>))}
+                                                {vendedores.map(vendedor => (<MenuItem key={vendedor.id} value={vendedor.id}>{`${vendedor.nombre} ${vendedor.cedula}`}</MenuItem>))}
                                             </Select>
                                         </Grid>
                                         {/* direccionentrega */}
@@ -266,7 +312,6 @@ const Oportunidades = ({ clientes, vendedores }) => {
                                         <Grid item xs={12} sm={6} md={6} lg={6}>
                                             <TextField
                                                 label="Plazo"
-
                                                 name="plazo"
                                                 id="plazo"
                                                 placeholder="Escriba el plazo..."
@@ -275,33 +320,19 @@ const Oportunidades = ({ clientes, vendedores }) => {
                                                 className={classes.field}
                                             />
                                         </Grid>
-
                                         {/* montolead */}
+                                        <Grid item xs={12} sm={6} md={6} lg={6}>
+                                            <TextField
+                                                label="Monto lead"
+                                                name="montolead"
+                                                id="montolead"
+                                                placeholder="Escriba el monto de negociacion..."
+                                                value={values.montolead}
+                                                onChange={handleChange}
+                                                className={classes.field}
+                                            />
+                                        </Grid>
                                     </Grid>
-
-
-
-                                    <TextField
-                                        label="Requerimiento"
-                                        name="requerimiento"
-                                        id="requerimiento"
-                                        placeholder="Escriba el requerimiento..."
-                                        value={values.requerimiento}
-                                        onChange={handleChange}
-                                        className={classes.field}
-                                    />
-                                    <TextField
-                                        label="Requerimiento"
-                                        name="requerimiento"
-                                        id="requerimiento"
-                                        placeholder="Escriba el requerimiento..."
-                                        value={values.requerimiento}
-                                        onChange={handleChange}
-                                        className={classes.field}
-                                    />
-
-
-
                                     <Button type="submit" color="primary" variant="contained" className={classes.button}>Enviar</Button>
                                 </form>
                             )}
@@ -310,7 +341,11 @@ const Oportunidades = ({ clientes, vendedores }) => {
                 </Grid>
 
             </Grid>
-
+            {alert && (
+                <Snackbar open={alert.alert} autoHideDuration={3000} onClose={handleClose}>
+                    <Alert variant="filled" onClose={handleClose} severity={alert.type}><b>{alert.title}</b> - {alert.text}</Alert>
+                </Snackbar>
+            )}
         </>
     )
 }
