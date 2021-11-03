@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Button, TextField, Grid, MenuItem, Select, InputLabel, Snackbar } from "@mui/material"
+import { Button, TextField, Grid, MenuItem, Select, InputLabel, Snackbar, Typography } from "@mui/material"
 import { makeStyles } from "@mui/styles"
 import { Box } from "@mui/system"
 import { Formik } from "formik"
@@ -93,7 +93,7 @@ const Oportunidades = ({ clientes, vendedores }) => {
             <Grid container spacing={3} alignItems="center" justifyContent="center">
 
                 {/* Grid Form */}
-                <Grid item xs={12} sm={6} md={4} lg={4}>
+                <Grid item xs={12} sm={6} md={6} lg={6}>
 
                     <Box className={classes.formContainer}>
                         <Formik
@@ -148,10 +148,10 @@ const Oportunidades = ({ clientes, vendedores }) => {
                         >
                             {({ handleChange, handleSubmit, values, resetForm, initialValues }) => (
                                 <form className="formulario" onSubmit={handleSubmit} style={{ display: "flex", flexFlow: "column wrap", padding: "10px" }}>
+                                    <Typography variant="title1">Registro de oportunidades</Typography>
                                     <Grid container justifyContent="center" alignItems="center" columnSpacing={1}>
-
                                         {/* Requerimiento */}
-                                        <Grid item xs={12}>
+                                        <Grid item xs={12} md={6}>
                                             <TextField
                                                 label="Requerimiento"
                                                 name="requerimiento"
@@ -164,7 +164,7 @@ const Oportunidades = ({ clientes, vendedores }) => {
                                         </Grid>
 
                                         {/* comentario */}
-                                        <Grid item xs={12}>
+                                        <Grid item xs={12} md={6}>
                                             <TextField
                                                 label="Comentario"
                                                 name="comentario"
