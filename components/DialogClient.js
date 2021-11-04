@@ -8,32 +8,29 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Formik } from "formik";
-import { Grid } from "@mui/material";
+import { Divider, Grid, IconButton, Typography } from "@mui/material";
+import { Box } from "@mui/system";
 
-export default function FormDialog({ openDialog }) {
-  const [open, setOpen] = React.useState(openDialog);
-
+export default function FormDialog({ openDialog, set, setAlert }) {
+  const [direccionesAdicionales, setDireccionesAdicionales] = React.useState([])
+  const [direcciones, setDirecciones] = React.useState('')
   const handleForm = async (e) => {
     e.preventDefault();
   };
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
+  const handleChangeDireccion = (e) => {
+    setDirecciones(e.target.value)
+  }
   const handleClose = () => {
-    setOpen(false);
+    set(false);
   };
-
-  // id
-  // nombre
-  // rif
-  // direccionfiscal
-  // telefonos
-  // email
+  const handleDireccion = () => {
+    setDireccionesAdicionales((prev) => [...prev, direcciones])
+    setDirecciones('')
+  }
 
   return (
     <div>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={openDialog} onClose={handleClose}>
         <DialogTitle
           style={{
             display: "flex",
@@ -56,15 +53,50 @@ export default function FormDialog({ openDialog }) {
               direccionfiscal: "",
               telefonos: "",
               email: "",
+              direcciones: ""
             }}
             onSubmit={async (data, { initialValues, resetForm }) => {
-              if (respuesta.status === 200) {
-                const data = await respuesta.json();
-                if (data.exito === "SI") {
-                  resetForm(initialValues);
-                } else {
-                  setAlert();
+              const url = `${window.location.origin}/api/clientes/add`
+              const raw = JSON.stringify({
+                datos: {
+                  nombre: data.nombre,
+                  rif: data.rif,
+                  direccionfiscal: data.direccionfiscal,
+                  telefonos: data.telefonos,
+                  email: data.email,
+                  direcciones: direccionesAdicionales
                 }
+              })
+              const options = {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: raw
+              }
+              try {
+                const respuesta = await fetch(url, options);
+                if (respuesta.status === 200) {
+                  const data = await respuesta.json();
+                  if (data.exito === "SI") {
+                    resetForm(initialValues);
+                  } else {
+                    setDireccionesAdicionales([])
+                    setAlert({
+                      alert: true,
+                      title: "Oops...",
+                      text: data.mensaje,
+                      type: "warning",
+                    });
+                  }
+                }
+              } catch (err) {
+                setAlert({
+                  alert: true,
+                  title: "Oops...",
+                  text: "Ocurrio un error al enviar los datos",
+                  type: "warning",
+                });
               }
             }}
           >
@@ -137,7 +169,26 @@ export default function FormDialog({ openDialog }) {
                       value={values.email}
                     />
                   </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box style={{ display: "flex", flexFlow: "row nowrap", justifyContent: "center", alignItems: "center" }}>
+                      <TextField
+                        id="direcciones"
+                        name="direcciones"
+                        label="Direccion adicional"
+                        type="text"
+                        variant="standard"
+                        onChange={handleChangeDireccion}
+                        value={direcciones}
+                      />
+                      <IconButton onClick={handleDireccion}><AddCircleOutlineIcon /></IconButton>
+                    </Box>
+                  </Grid>
                 </Grid>
+                {direccionesAdicionales && (<Divider textAlign="center">
+                  <Typography variant="body2" style={{ margin: "20px 0" }}>Lista de direcciones adicionales</Typography>
+                </Divider>
+                )}
+                {direccionesAdicionales && direccionesAdicionales.map(d => (<Typography>- {d}</Typography>))}
                 <DialogActions>
                   <Button onClick={handleClose}>Cancelar</Button>
                   <Button type="submit">Registrar cliente</Button>

@@ -9,6 +9,7 @@ import {
   Snackbar,
   Typography,
   Divider,
+  IconButton,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { Box } from "@mui/system";
@@ -17,6 +18,7 @@ import Navbar from "../components/Navbar";
 import Autocomplete from "@mui/material/Autocomplete";
 import MuiAlert from "@mui/material/Alert";
 import FormDialog from "../components/DialogClient";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -80,6 +82,10 @@ export const getServerSideProps = async (req, res) => {
 
 /* Functional Component */
 const Oportunidades = ({ clientes, vendedores }) => {
+  const [toggleModal, setToggleModal] = useState(false)
+  const toggleModalButton = () => {
+    setToggleModal((prev) => !prev)
+  }
   const [alert, setAlert] = useState({
     alert: false,
     title: "",
@@ -170,37 +176,47 @@ const Oportunidades = ({ clientes, vendedores }) => {
                     padding: "10px",
                   }}
                 >
-                  <Typography variant="title1">
-                    Registro de oportunidades
-                  </Typography>
+                  <Divider textAlign="center" >
+                    <Typography variant="body1">
+                      Registro de oportunidades
+                    </Typography>
+                  </Divider>
                   <Grid
                     container
                     justifyContent="center"
                     alignItems="center"
                     columnSpacing={1}
+                    style={{ margin: "20px auto" }}
                   >
                     {/* idcliente */}
                     <Grid item xs={12}>
-                      <InputLabel id="cliente-seleccionado">Cliente</InputLabel>
-                      <Select
-                        labelId="cliente-seleccionado"
-                        name="idcliente"
-                        id="idcliente"
-                        label="Cliente"
-                        value={values.idcliente}
-                        onChange={handleChange}
-                        style={{ width: "100%" }}
-                      >
-                        <MenuItem value={0} disabled>
-                          <em>Seleccionar</em>
-                        </MenuItem>
-                        {clientes.map((cl) => (
-                          <MenuItem
-                            key={cl.id}
-                            value={cl.id}
-                          >{`${cl.nombre} ${cl.rif}`}</MenuItem>
-                        ))}
-                      </Select>
+                      <Box style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexFlow: "row nowrap" }}>
+                        <Box style={{ width: "90%" }}>
+                          <Select
+                            labelId="cliente-seleccionado"
+                            name="idcliente"
+                            id="idcliente"
+                            label="Cliente"
+                            value={values.idcliente}
+                            onChange={handleChange}
+                            style={{ width: "100%" }}
+                          >
+                            <MenuItem value={0} disabled>
+                              <em>Seleccionar cliente</em>
+                            </MenuItem>
+                            {clientes.map((cl) => (
+                              <MenuItem
+                                key={cl.id}
+                                value={cl.id}
+                              >{`${cl.nombre} ${cl.rif}`}</MenuItem>
+                            ))}
+                          </Select>
+                        </Box>
+                        <IconButton onClick={toggleModalButton} color="primary" >
+                          <AddCircleIcon />
+                        </IconButton>
+                      </Box>
+
                     </Grid>
                     {/* Requerimiento */}
                     <Grid item xs={12}>
@@ -229,16 +245,20 @@ const Oportunidades = ({ clientes, vendedores }) => {
                       />
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="title">
-                        Escriba la prioridad, siendo 4 el numero más alto a
-                        priorizar
-                      </Typography>
+                      <Divider textAlign="center" >
+                        <Typography variant="body1">
+                          Escriba la prioridad
+                        </Typography>
+                      </Divider>
+                      <Typography variant="subtitle2">Siendo el número 4 el primero a priorizar</Typography>
                     </Grid>
 
                     {/* prioridad_precio */}
                     <Grid item xs={12} sm={6} md={3} lg={3}>
                       <TextField
                         label="Precio"
+                        type="text"
+                        inputProps={{ inputMode: 'numeric', pattern: '/[1-4]/' }}
                         name="prioridad_precio"
                         id="prioridad_precio"
                         placeholder="Escriba el precio a priorizar..."
@@ -252,6 +272,8 @@ const Oportunidades = ({ clientes, vendedores }) => {
                     <Grid item xs={12} sm={6} md={3} lg={3}>
                       <TextField
                         label="Plazo"
+                        type="text"
+                        inputProps={{ inputMode: 'numeric', pattern: '/[1-4]/' }}
                         name="prioridad_plazo"
                         id="prioridad_plazo"
                         placeholder="Escriba el plazo a priorizar..."
@@ -265,6 +287,8 @@ const Oportunidades = ({ clientes, vendedores }) => {
                     <Grid item xs={12} sm={6} md={3} lg={3}>
                       <TextField
                         label="Marca"
+                        type="text"
+                        inputProps={{ inputMode: 'numeric', pattern: '/[1-4]/*' }}
                         name="prioridad_marca"
                         id="prioridad_marca"
                         placeholder="Escriba la marca a priorizar..."
@@ -278,6 +302,8 @@ const Oportunidades = ({ clientes, vendedores }) => {
                     <Grid item xs={12} sm={6} md={3} lg={3}>
                       <TextField
                         label="Garantía"
+                        type="text"
+                        inputProps={{ inputMode: 'numeric', pattern: '/[1-4]/' }}
                         name="prioridad_garantia"
                         id="prioridad_garantia"
                         placeholder="Escriba la  de garantía..."
@@ -343,7 +369,7 @@ const Oportunidades = ({ clientes, vendedores }) => {
           </Box>
         </Grid>
       </Grid>
-      <FormDialog openDialog={true} />
+      <FormDialog openDialog={toggleModal} set={setToggleModal} setAlert={setAlert} />
       {alert && (
         <Snackbar
           open={alert.alert}
