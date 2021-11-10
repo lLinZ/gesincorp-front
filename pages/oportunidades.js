@@ -65,12 +65,14 @@ export const getServerSideProps = async (req, res) => {
   };
 
   // Se solicitan los clientes
-  const respuestaClientes = await fetch(urlClientes, optionsClientes);
-  const dataClientes = await respuestaClientes.json();
+  // const respuestaClientes = await fetch(urlClientes, optionsClientes);
+  // // const dataClientes = await respuestaClientes.json();
+  // console.log(respuestaClientes)
 
   // Se solicitan los vendedores
   const respuestaVendedores = await fetch(urlVendedores, optionsVendedores);
-  const dataVendedores = await respuestaVendedores.json();
+  // const dataVendedores = await respuestaVendedores.json();
+  console.log(respuestaVendedores)
 
   return {
     props: {
