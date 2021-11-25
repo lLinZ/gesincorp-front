@@ -65,26 +65,27 @@ export const getServerSideProps = async (req, res) => {
   };
 
   // Se solicitan los clientes
-  // const respuestaClientes = await fetch(urlClientes, optionsClientes);
-  // // const dataClientes = await respuestaClientes.json();
-  // console.log(respuestaClientes)
+  const respuestaClientes = await fetch(urlClientes, optionsClientes);
+  const dataClientes = await respuestaClientes.json();
+  console.log(respuestaClientes)
 
   // Se solicitan los vendedores
-  const respuestaVendedores = await fetch(urlVendedores, optionsVendedores);
-  // const dataVendedores = await respuestaVendedores.json();
-  console.log(respuestaVendedores)
+  // const respuestaVendedores = await fetch(urlVendedores, optionsVendedores);
+  // // const dataVendedores = await respuestaVendedores.json();
+  // console.log(respuestaVendedores)
 
   return {
     props: {
       clientes: dataClientes,
-      vendedores: dataVendedores,
+      // vendedores: dataVendedores,
     },
   };
 };
 
 /* Functional Component */
-const Oportunidades = ({ clientes, vendedores }) => {
+const Oportunidades = ({ clientes }) => {
   const [toggleModal, setToggleModal] = useState(false)
+  const [clients, setClients] = useState(clientes)
   const toggleModalButton = () => {
     setToggleModal((prev) => !prev)
   }
@@ -206,7 +207,7 @@ const Oportunidades = ({ clientes, vendedores }) => {
                             <MenuItem value={0} disabled>
                               <em>Seleccionar cliente</em>
                             </MenuItem>
-                            {clientes.map((cl) => (
+                            {clients.map((cl) => (
                               <MenuItem
                                 key={cl.id}
                                 value={cl.id}
@@ -259,8 +260,8 @@ const Oportunidades = ({ clientes, vendedores }) => {
                     <Grid item xs={12} sm={6} md={3} lg={3}>
                       <TextField
                         label="Precio"
-                        type="text"
-                        inputProps={{ inputMode: 'numeric', pattern: '/[1-4]/' }}
+                        type="number"
+                        inputProps={{ inputMode: "numeric", pattern: "/\d/g", maxLength: 1 }}
                         name="prioridad_precio"
                         id="prioridad_precio"
                         placeholder="Escriba el precio a priorizar..."
@@ -274,8 +275,8 @@ const Oportunidades = ({ clientes, vendedores }) => {
                     <Grid item xs={12} sm={6} md={3} lg={3}>
                       <TextField
                         label="Plazo"
-                        type="text"
-                        inputProps={{ inputMode: 'numeric', pattern: '/[1-4]/' }}
+                        type="number"
+                        inputProps={{ inputMode: "numeric", pattern: "/\d/g", maxLength: 1 }}
                         name="prioridad_plazo"
                         id="prioridad_plazo"
                         placeholder="Escriba el plazo a priorizar..."
@@ -289,8 +290,8 @@ const Oportunidades = ({ clientes, vendedores }) => {
                     <Grid item xs={12} sm={6} md={3} lg={3}>
                       <TextField
                         label="Marca"
-                        type="text"
-                        inputProps={{ inputMode: 'numeric', pattern: '/[1-4]/*' }}
+                        type="number"
+                        inputProps={{ inputMode: "numeric", pattern: "/\d/g", maxLength: 1 }}
                         name="prioridad_marca"
                         id="prioridad_marca"
                         placeholder="Escriba la marca a priorizar..."
@@ -304,8 +305,8 @@ const Oportunidades = ({ clientes, vendedores }) => {
                     <Grid item xs={12} sm={6} md={3} lg={3}>
                       <TextField
                         label="Garantía"
-                        type="text"
-                        inputProps={{ inputMode: 'numeric', pattern: '/[1-4]/' }}
+                        type="number"
+                        inputProps={{ inputMode: "numeric", pattern: "/\d/g", maxLength: 1 }}
                         name="prioridad_garantia"
                         id="prioridad_garantia"
                         placeholder="Escriba la  de garantía..."
@@ -371,7 +372,7 @@ const Oportunidades = ({ clientes, vendedores }) => {
           </Box>
         </Grid>
       </Grid>
-      <FormDialog openDialog={toggleModal} set={setToggleModal} setAlert={setAlert} />
+      <FormDialog openDialog={toggleModal} set={setToggleModal} setAlert={setAlert} setClients={setClients} />
       {alert && (
         <Snackbar
           open={alert.alert}

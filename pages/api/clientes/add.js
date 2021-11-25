@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     try {
         const respuesta = await fetch(url, options);
         if (respuesta.status === 200) {
-            const data = await respuesta.text();
+            const data = await respuesta.json();
             res.status(200).json(data)
         } else {
             console.log(respuesta)

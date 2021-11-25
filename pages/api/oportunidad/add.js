@@ -2,7 +2,7 @@ export default async function handler(req, res) {
 
     const { datos } = req.body;
     const raw = JSON.stringify(datos)
-    const url = `https://gesincorp.sgc-consultores.com.ve/oportunidades`
+    const url = `${process.env.BASE_URL}/oportunidades`
     const options = {
         method: "POST",
         headers: {

@@ -11,7 +11,7 @@ import { Formik } from "formik";
 import { Divider, Grid, IconButton, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 
-export default function FormDialog({ openDialog, set, setAlert }) {
+export default function FormDialog({ openDialog, set, setAlert, setClients }) {
   const [direccionesAdicionales, setDireccionesAdicionales] = React.useState([])
   const [direcciones, setDirecciones] = React.useState('')
   const handleForm = async (e) => {
@@ -77,17 +77,19 @@ export default function FormDialog({ openDialog, set, setAlert }) {
               try {
                 const respuesta = await fetch(url, options);
                 if (respuesta.status === 200) {
-                  const data = await respuesta.json();
-                  if (data.exito === "SI") {
-                    resetForm(initialValues);
-                  } else {
-                    setDireccionesAdicionales([])
+                  try {
                     setAlert({
                       alert: true,
-                      title: "Oops...",
-                      text: data.mensaje,
-                      type: "warning",
-                    });
+                      title: "Yay!",
+                      text: "Cliente agregado exitosamente",
+                      type: "success"
+                    })
+                    const data = await respuesta.json();
+                    // console.log(data);
+                    setClients(data)
+                    resetForm(initialValues);
+                  } catch (err) {
+                    console.log(err)
                   }
                 }
               } catch (err) {
@@ -198,6 +200,6 @@ export default function FormDialog({ openDialog, set, setAlert }) {
           </Formik>
         </DialogContent>
       </Dialog>
-    </div>
+    </div >
   );
 }
