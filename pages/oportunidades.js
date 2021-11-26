@@ -1,24 +1,29 @@
 import React, { useState } from "react";
+// MUI components
 import {
   Button,
   TextField,
   Grid,
   MenuItem,
   Select,
-  InputLabel,
   Snackbar,
   Typography,
   Divider,
   IconButton,
 } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 import { Box } from "@mui/system";
-import { Formik } from "formik";
-import Navbar from "../components/Navbar";
-import Autocomplete from "@mui/material/Autocomplete";
 import MuiAlert from "@mui/material/Alert";
-import FormDialog from "../components/DialogClient";
+// Icons
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+// Classes
+import { makeStyles } from "@mui/styles";
+// Custom Components
+import Navbar from "../components/Navbar";
+import FormDialog from "../components/DialogClient";
+import ProductDialog from "../components/DialogProduct";
+
+// Formik
+import { Formik } from "formik";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -67,7 +72,7 @@ export const getServerSideProps = async (req, res) => {
   // Se solicitan los clientes
   const respuestaClientes = await fetch(urlClientes, optionsClientes);
   const dataClientes = await respuestaClientes.json();
-  console.log(respuestaClientes)
+  // console.log(respuestaClientes)
 
   // Se solicitan los vendedores
   // const respuestaVendedores = await fetch(urlVendedores, optionsVendedores);
@@ -84,17 +89,38 @@ export const getServerSideProps = async (req, res) => {
 
 /* Functional Component */
 const Oportunidades = ({ clientes }) => {
+
+  // Modal clientes
   const [toggleModal, setToggleModal] = useState(false)
+
+  // Modal detalles
+  const [toggleModalProduct, setToggleModalProduct] = useState(false)
+
+  // Clientes
   const [clients, setClients] = useState(clientes)
-  const toggleModalButton = () => {
-    setToggleModal((prev) => !prev)
-  }
+
+  // Detalle de oportunidad
+  const [products, setProducts] = useState([])
+
+  // Popups
   const [alert, setAlert] = useState({
     alert: false,
     title: "",
     text: "",
     type: "",
   });
+
+  // Funcion para abrir el modal de detalles
+  const handleOpenProductsDialog = () => {
+    setToggleModalProduct((prev) => !prev)
+  }
+
+  // Funcion para abrir el modal de clientes
+  const toggleModalButton = () => {
+    setToggleModal((prev) => !prev)
+  }
+
+  // Funcion que se ejecuta al cerrarse la alerta
   const handleClose = () => {
     setAlert({
       alert: false,
@@ -103,6 +129,8 @@ const Oportunidades = ({ clientes }) => {
       type: "",
     });
   };
+
+  // Clases de CSS
   const classes = useStyle();
   return (
     <>
@@ -119,7 +147,9 @@ const Oportunidades = ({ clientes }) => {
                 requerimiento: "",
                 comentario: "",
                 idcliente: 0,
-                idvendedor: 0,
+                nombrecliente: '',
+                idvendedor: 1,
+                nombrevendedor: 'Jose Linares',
                 direccionentrega: "",
                 prioridad_precio: "",
                 prioridad_plazo: "",
@@ -131,9 +161,33 @@ const Oportunidades = ({ clientes }) => {
                 fechaestimadacierre: "",
               }}
               onSubmit={async (datos, { initialValues, resetForm }) => {
-                console.log("Formulario enviado", { datos });
-                const urlSend = `${window.location.origin}/api/oportunidad/add`;
-                const raw = JSON.stringify({ datos: datos });
+
+                // Se obtienen los datos del cliente seleccionado
+                const clienteSeleccionado = clients.filter(arr => arr.id === datos.idcliente)
+                // Se extrae el nombre
+                const nombrecliente = clienteSeleccionado[0].nombre;
+
+
+                // Datos del body
+                const raw = JSON.stringify({
+                  comentario: datos.comentario,
+                  direccionentrega: datos.direccionentrega,
+                  fechaestimadacierre: datos.fechaestimadacierre,
+                  fechahora: datos.fechahora,
+                  idcliente: datos.idcliente,
+                  idvendedor: 1,
+                  nombrevendedor: "Jose Linares",
+                  montolead: datos.montolead,
+                  nombrecliente: nombrecliente,
+                  plazo: datos.plazo,
+                  prioridad_garantia: datos.prioridad_garantia,
+                  prioridad_marca: datos.prioridad_marca,
+                  prioridad_plazo: datos.prioridad_plazo,
+                  prioridad_precio: datos.prioridad_precio,
+                  requerimiento: datos.requerimiento,
+                  detalles_oportunidad: products,
+                });
+                // Options de la solicitud HTTP
                 const optionsSend = {
                   method: "POST",
                   headers: {
@@ -141,26 +195,40 @@ const Oportunidades = ({ clientes }) => {
                   },
                   body: raw,
                 };
-                const respuesta = await fetch(urlSend, optionsSend);
+                // URL de la solicitud HTTP
+                const urlSend = `${window.location.origin}/api/oportunidad/add`;
 
-                if (respuesta.status === 200) {
-                  const data = await respuesta.json();
-                  console.log(data);
-                  resetForm(initialValues);
+                try {
+                  // Se ejecuta la solicitud
+                  const respuesta = await fetch(urlSend, optionsSend);
+
+                  if (respuesta.status === 200) {
+                    const data = await respuesta.json();
+                    console.log(data);
+                    resetForm(initialValues);
+                    setAlert({
+                      alert: true,
+                      title: "¡Perfecto!",
+                      text: "Se ha registrado la oportunidad exitosamente",
+                      type: "success",
+                    });
+                  } else {
+                    setAlert({
+                      alert: true,
+                      title: "Oops...",
+                      text: "No se ha logrado registrar la oportunidad",
+                      type: "warning",
+                    });
+                  }
+                } catch (err) {
                   setAlert({
                     alert: true,
-                    title: "Yay!",
-                    text: "Se ha registrado el usuario exitosamente",
-                    type: "success",
-                  });
-                } else {
-                  setAlert({
-                    alert: true,
-                    title: "Oops...",
-                    text: "No se ha logrado registrar el usuario",
-                    type: "warning",
+                    title: "¡Que mal!",
+                    text: "Ocurrió un error de conexión",
+                    type: "error",
                   });
                 }
+
               }}
             >
               {({
@@ -247,6 +315,26 @@ const Oportunidades = ({ clientes }) => {
                         className={classes.field}
                       />
                     </Grid>
+
+                    {/* Detalles de la oportunidad */}
+                    <Grid item xs={12}>
+                      <Divider textAlign="center" >
+                        <Typography variant="body1">
+                          Detalles de la oportunidad
+                        </Typography>
+                      </Divider>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Button
+                        type="button"
+                        color="primary"
+                        variant="contained"
+                        onClick={handleOpenProductsDialog}
+                        className={classes.button}
+                      > Añadir productos</Button>
+                    </Grid>
+
+                    {/* Prioridad */}
                     <Grid item xs={12}>
                       <Divider textAlign="center" >
                         <Typography variant="body1">
@@ -372,7 +460,14 @@ const Oportunidades = ({ clientes }) => {
           </Box>
         </Grid>
       </Grid>
+
+      {/* Dialog de clientes */}
       <FormDialog openDialog={toggleModal} set={setToggleModal} setAlert={setAlert} setClients={setClients} />
+
+      {/* Dialog de productos */}
+      <ProductDialog openDialog={toggleModalProduct} set={setToggleModalProduct} setAlert={setAlert} setProducts={setProducts} />
+
+      {/* Popups */}
       {alert && (
         <Snackbar
           open={alert.alert}
@@ -380,7 +475,7 @@ const Oportunidades = ({ clientes }) => {
           onClose={handleClose}
         >
           <Alert variant="filled" onClose={handleClose} severity={alert.type}>
-            <b>{alert.title}</b> - {alert.text}
+            <b>{alert.title}</b> {alert.text}
           </Alert>
         </Snackbar>
       )}

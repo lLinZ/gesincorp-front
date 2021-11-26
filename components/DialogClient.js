@@ -192,7 +192,7 @@ export default function FormDialog({ openDialog, set, setAlert, setClients }) {
                 )}
                 {direccionesAdicionales && direccionesAdicionales.map(d => (<Typography>- {d}</Typography>))}
                 <DialogActions>
-                  <Button onClick={handleClose}>Cancelar</Button>
+                  <Button onClick={handleClose}>Cerrar</Button>
                   <Button type="submit">Registrar cliente</Button>
                 </DialogActions>
               </form>
